@@ -1,5 +1,6 @@
 public enum CellType {
     EMPTY,
     FOOD,
-    SNAKE
+    SNAKE,
+    HEAD
 }
