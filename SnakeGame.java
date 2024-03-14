@@ -115,7 +115,6 @@ public class SnakeGame implements KeyListener
         panel.setSize(frame.getSize());
         panel.setLocation(0, 0);
 
-        
 
         // Initialize all instances
         Cell[][] board = new Cell[30][30];

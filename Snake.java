@@ -204,7 +204,7 @@ public class Snake
             }
         }
         
-        // Set new snake position
+        // Update tail position
         if (curPos.getCellType() != CellType.FOOD && snakeComponents.size() > MIN_SNAKE_LENGTH)
         {
             Cell tail = snakeComponents.removeLast();
