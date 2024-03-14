@@ -25,6 +25,7 @@ public class Snake
     private final int MIN_SNAKE_LENGTH = 3;                            // Starting length of snake
     private Direction direction;                                       // Current direction of snake
     private SnakeGame game;                                            // Reference to SnakeGame
+    private int score;                                                 // Score of current game 
 
 
 
@@ -32,10 +33,10 @@ public class Snake
     /**
      * Constructor to create the snake
      */
-    public Snake(Cell start, Cell[][] board, SnakeGame game) 
+    public Snake(Cell head, Cell[][] board, SnakeGame game) 
     {
         // Create first snake component (the head)
-        snakeComponents.addFirst(new Cell(start.row, start.col, CellType.SNAKE));
+        snakeComponents.addFirst(new Cell(head.row, head.col, CellType.SNAKE));
 
         // Set initial snake direction and save instance of SnakeGame
         this.direction = Direction.DOWN;
@@ -65,9 +66,20 @@ public class Snake
 
 
     /**
-     * A getter method for the snakes components
+     * A getter method for the snakes components.
      */
     public LinkedList<Cell> getSnakeComponents() {return this.snakeComponents;}
+
+
+    /**
+     * A getter method for the snakes current direction.
+     */
+    public Direction getDirection() {return this.direction;}
+
+     /**
+     * A getter method for the score.
+     */
+    public int getScore() {return this.score;}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,8 +96,8 @@ public class Snake
     public void createFood(Cell[][] board) 
     {
         Random rand = new Random();
-        for (int i = 0; i < 30; i++) {
-            for (int j = 0; j < 30; j++) {
+        for (int i = 0; i < 28; i++) {
+            for (int j = 0; j < 28; j++) {
                 if (rand.nextInt(600) == 3 && board[i][j].getCellType() == CellType.EMPTY) {
                     board[i][j] = new Cell(i, j, CellType.FOOD);
                 }
@@ -108,18 +120,20 @@ public class Snake
         int newCol = segment.col;
         snakeComponents.push(new Cell(newRow, newCol, CellType.SNAKE));
 
+        this.score++;
+
         // Generate more food
         createFood(board);
 
         // Increase speed of the snake
-        game.setClock(game.getClock() + 5);
+        game.setClock(game.getClock() + 3);
     }
 
 
     /**
      * If snake hits itself or a wall, the game ends and the snake dies.
      */
-    public void die() {game.endGame();}
+    public void die(int reason) {game.endGame(reason);}
 
     
     /**
@@ -146,6 +160,7 @@ public class Snake
         // Current row and column that the head of the snake is at
         int curRow = snakeComponents.getFirst().row;
         int curCol = snakeComponents.getFirst().col;
+        Cell curPos = board[curRow][curCol];
 
         // Calculate the next cell based on the current cell and selected direction
         Cell nextCell;
@@ -168,29 +183,37 @@ public class Snake
                 break;
         }
 
-        // Current position
-        Cell oldPos = board[curRow][curCol];
+        // Check if snake hit a wall
+        if(nextCell.row > 29 || nextCell.row < 0 || nextCell.col > 29 || nextCell.col < 0) {
+            die(0);
+            return;
+        }
 
         // Check if snake hit food
         if (board[nextCell.row][nextCell.col].getCellType() == CellType.FOOD) {
             eat(board);
         }
 
-        // Check if snake is going to hit the edge
-        if (nextCell.row == board[nextCell.row-1].length || nextCell.col == board[nextCell.col-1].length){
-            die();
+        /* Check if snake hit itself by iterating over each snake component and 
+        checking its cell position with the next cells position. 
+        */
+        for (Cell segment : snakeComponents) {
+            if (segment.row == nextCell.row && segment.col == nextCell.col) {
+                die(1);
+                return;
+            }
         }
         
         // Set new snake position
-        if (oldPos.getCellType() != CellType.FOOD && snakeComponents.size() > MIN_SNAKE_LENGTH)
+        if (curPos.getCellType() != CellType.FOOD && snakeComponents.size() > MIN_SNAKE_LENGTH)
         {
             Cell tail = snakeComponents.removeLast();
             board[tail.row][tail.col] = new Cell(tail.row, tail.col, CellType.EMPTY);
-            oldPos = board[snakeComponents.getFirst().row][snakeComponents.getFirst().col];
+            curPos = board[snakeComponents.getFirst().row][snakeComponents.getFirst().col];
         }
 
         // Update head position
-        board[oldPos.row][oldPos.col] = new Cell(oldPos.row, oldPos.col, CellType.EMPTY);
+        board[curRow][curCol] = new Cell(curRow, curCol, CellType.EMPTY);
         snakeComponents.push(nextCell);
         board[nextCell.row][nextCell.col] = nextCell;
 

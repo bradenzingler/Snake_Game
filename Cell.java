@@ -46,11 +46,7 @@ public class Cell extends JPanel
         // Set cell colors based on the cells type
         if (cellType.equals(CellType.SNAKE)) setBackground(Color.GREEN);
         if (cellType.equals(CellType.FOOD)) setBackground(Color.RED);
-        if (cellType.equals(CellType.EMPTY)) setBackground(Color.GRAY);
-        if (cellType.equals(CellType.HEAD)) setBackground(Color.BLACK);
-
-        // Set the cells border color to see the grid
-        setBorder(new LineBorder(Color.BLACK));
+        if (cellType.equals(CellType.EMPTY)) setBackground(Color.WHITE);
     }
 
 
